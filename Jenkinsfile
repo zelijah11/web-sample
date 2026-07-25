@@ -6,15 +6,9 @@ pipeline {
     TAG = "${BUILD_NUMBER}"
   }
   stages {
-    stage('Build') {
+    stage('Build & Push') {
       steps {
-        sh "docker build -t ${REGISTRY}/${IMAGE}:${TAG} -t ${REGISTRY}/${IMAGE}:latest ."
-      }
-    }
-    stage('Push') {
-      steps {
-        sh "docker push ${REGISTRY}/${IMAGE}:${TAG}"
-        sh "docker push ${REGISTRY}/${IMAGE}:latest"
+        sh "docker buildx build --platform linux/amd64,linux/arm64 --builder multiarch --push -t ${REGISTRY}/${IMAGE}:${TAG} -t ${REGISTRY}/${IMAGE}:latest ."
       }
     }
     stage('Deploy') {
