@@ -8,7 +8,10 @@ pipeline {
   stages {
     stage('Build & Push') {
       steps {
-        sh "docker buildx build --platform linux/amd64,linux/arm64 --builder multiarch --push -t ${REGISTRY}/${IMAGE}:${TAG} -t ${REGISTRY}/${IMAGE}:latest ."
+        sh """
+          docker buildx create --use --name multiarch --driver docker-container 2>/dev/null || docker buildx use multiarch
+          docker buildx build --platform linux/amd64,linux/arm64 --builder multiarch --push -t ${REGISTRY}/${IMAGE}:${TAG} -t ${REGISTRY}/${IMAGE}:latest .
+        """
       }
     }
     stage('Deploy') {
